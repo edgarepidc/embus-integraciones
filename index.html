@@ -313,13 +313,16 @@
     animation: fadeUp .4s .32s both;
   }
   .dates-title { font-size: .95rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
-  .dates-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; text-align: center; }
+  .dates-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem; text-align: center; }
+  @media (max-width: 600px) { .dates-grid { grid-template-columns: repeat(2,1fr); } }
   .date-item { display: flex; flex-direction: column; gap: .2rem; }
-  .date-val  { font-size: 1.5rem; font-weight: 700; letter-spacing: -.5px; line-height: 1; }
+  .date-val  { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; line-height: 1.15; }
   .date-lbl  { font-size: .7rem; color: var(--gray-500); line-height: 1.35; }
   .date-amber { color: #d97706; }
   .date-blue  { color: #2563eb; }
   .date-green { color: #16a34a; }
+  .date-purple { color: #7c3aed; }
+  .date-teal  { color: #0d9488; }
   
   /* ── FOOTER ── */
   .site-footer {
@@ -420,19 +423,8 @@
       </div>
       <div class="dates-box">
         <div class="dates-title">🗓 Fechas clave del proyecto</div>
-        <div class="dates-grid">
-          <div class="date-item">
-            <div class="date-val date-amber" id="fechaInsumos">...</div>
-            <div class="date-lbl">Entrega insumos E2E<br>(matriz de casos)</div>
-          </div>
-          <div class="date-item">
-            <div class="date-val date-blue" id="fechaE2E">...</div>
-            <div class="date-lbl">Inicio estimado<br>pruebas E2E</div>
-          </div>
-          <div class="date-item">
-            <div class="date-val date-green" id="fechaGoLive">...</div>
-            <div class="date-lbl">Go Live estimado<br>Piloto</div>
-          </div>
+        <div class="dates-grid" id="datesGrid">
+          <div class="loading-msg" style="padding:1rem; grid-column:1/-1;">Cargando fechas...</div>
         </div>
       </div>
     </div>
@@ -442,7 +434,7 @@
 
 <footer class="site-footer">
   <p>📊 Dashboard conectado a Google Sheets · 
-  <a href="https://docs.google.com/spreadsheets/d/TU_ID_DE_HOJA_DE_CALCULO" target="_blank">Abrir hoja de cálculo</a> · 
+  <a href="https://docs.google.com/spreadsheets/d/1TAk4MhuexItonqe8PnjKlzCehk053vbxTasRgYQuJvM/edit?gid=1512346756" target="_blank">Abrir hoja de cálculo</a> · 
   Actualizado: <span id="updateTime">--</span></p>
 </footer>
 
@@ -453,6 +445,17 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbz6DlAGm55msKoXrP-I-msq
 let qaData = [];
 let devData = [];
 let config = {};
+
+const DATE_FIELDS = [
+  { key: 'insumos_fecha', label: 'Entrega insumos E2E<br>(matriz de casos)', color: 'date-amber' },
+  { key: 'e2e_corte 1', label: 'E2E Corte 1', color: 'date-blue' },
+  { key: 'e2e_corte 2', label: 'E2E Corte 2', color: 'date-blue' },
+  { key: 'Go no go', label: 'Go / No Go', color: 'date-purple' },
+  { key: 'go_live Primera Venta', label: 'Go Live<br>Primera Venta', color: 'date-green' },
+  { key: 'Primer Despacho', label: 'Primer Despacho', color: 'date-teal' }
+];
+
+const CONFIG_META_KEYS = new Set(['clave', 'semana', 'mes_anio']);
 
 // 📅 Función para formatear fechas
 function formatDate(dateStr) {
@@ -484,19 +487,25 @@ function formatDate(dateStr) {
 // 📅 Formatear fecha corta (solo día y mes abreviado)
 function formatShortDate(dateStr) {
   if (!dateStr) return '...';
-  
-  // Si ya está en formato texto
-  if (typeof dateStr === 'string' && !dateStr.includes('T') && !dateStr.includes('-')) {
-    return dateStr;
+
+  const monthAbbr = {
+    enero: 'ene', febrero: 'feb', marzo: 'mar', abril: 'abr', mayo: 'may', junio: 'jun',
+    julio: 'jul', agosto: 'ago', septiembre: 'sep', octubre: 'oct', noviembre: 'nov', diciembre: 'dic'
+  };
+
+  const textMatch = String(dateStr).match(/^(\d{1,2})\s+([a-záéíóúñ]+)(?:\s+\d{4})?/i);
+  if (textMatch) {
+    const month = textMatch[2].toLowerCase();
+    return `${textMatch[1]} ${monthAbbr[month] || month.slice(0, 3)}`;
   }
-  
+
   try {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr;
-    
-    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 
+
+    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun',
                     'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    
+
     return `${date.getDate()} ${months[date.getMonth()]}`;
   } catch(e) {
     return dateStr;
@@ -624,17 +633,30 @@ function renderDevCards() {
 }
 
 function renderDates() {
-  // Formatear fechas
-  const fechaInsumos = formatDate(config.insumos_fecha) || '15 mayo 2026';
-  const fechaE2E = formatDate(config.e2e_inicio) || '27 mayo 2026';
-  const fechaGoLive = formatDate(config.go_live) || '26 junio 2026';
-  
-  document.getElementById('insumosDeadline').textContent = 
+  const fechaInsumos = formatDate(config.insumos_fecha) || '—';
+
+  document.getElementById('insumosDeadline').textContent =
     '⚠️ Fecha límite de entrega: ' + fechaInsumos;
-  
-  document.getElementById('fechaInsumos').textContent = formatShortDate(config.insumos_fecha) || '15 may';
-  document.getElementById('fechaE2E').textContent = formatShortDate(config.e2e_inicio) || '27 may';
-  document.getElementById('fechaGoLive').textContent = formatShortDate(config.go_live) || '26 jun';
+
+  const knownKeys = new Set(DATE_FIELDS.map(field => field.key));
+  const extraFields = Object.keys(config)
+    .filter(key => !CONFIG_META_KEYS.has(key) && !knownKeys.has(key) && config[key])
+    .map(key => ({ key, label: key, color: 'date-blue' }));
+
+  const fields = [...DATE_FIELDS, ...extraFields].filter(field => config[field.key]);
+
+  const grid = document.getElementById('datesGrid');
+  if (!fields.length) {
+    grid.innerHTML = '<div class="loading-msg" style="padding:1rem; grid-column:1/-1;">Sin fechas configuradas</div>';
+    return;
+  }
+
+  grid.innerHTML = fields.map(field => `
+    <div class="date-item">
+      <div class="date-val ${field.color}">${formatShortDate(config[field.key])}</div>
+      <div class="date-lbl">${field.label}</div>
+    </div>
+  `).join('');
 }
 
 function switchTab(id, btn) {
