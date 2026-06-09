@@ -275,24 +275,45 @@
   /* ── HIGHLIGHT ── */
   .highlight-green { color: var(--green); font-size: .73rem; font-style: italic; margin-top: .5rem; }
 
-  /* ── BOTTOM BOXES ── */
-  .bottom-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1.5rem;
+  /* ── FECHAS TAB ── */
+  .fechas-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: .5rem;
   }
-  @media (max-width: 700px) { .bottom-row { grid-template-columns: 1fr; } }
 
   .insumos-box {
-    background: #fff7ed;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     border: 1.5px solid #fed7aa;
-    border-radius: 14px;
-    padding: 1.2rem 1.4rem;
-    animation: fadeUp .4s .28s both;
+    border-radius: 16px;
+    padding: 1.35rem 1.5rem;
+    animation: fadeUp .4s .2s both;
+    position: relative;
+    overflow: hidden;
+  }
+  .insumos-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #f59e0b, #ea580c);
+    border-radius: 4px 0 0 4px;
   }
   .insumos-title { font-size: .95rem; font-weight: 700; color: #92400e; margin-bottom: .25rem; }
-  .insumos-deadline { font-size: .8rem; font-weight: 600; color: #d97706; margin-bottom: .6rem; }
+  .insumos-deadline {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #b45309;
+    background: rgba(255,255,255,.65);
+    border: 1px solid #fde68a;
+    padding: .35rem .75rem;
+    border-radius: 999px;
+    margin-bottom: .75rem;
+  }
   .insumos-sub { font-size: .78rem; color: #78350f; margin-bottom: .65rem; }
   .chips-row { display: flex; flex-wrap: wrap; gap: .4rem; }
   .area-chip {
@@ -303,26 +324,356 @@
     font-weight: 600;
     padding: 4px 12px;
     border-radius: 20px;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .area-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(217,119,6,.15);
   }
 
-  .dates-box {
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 1.2rem 1.4rem;
-    animation: fadeUp .4s .32s both;
+  .timeline-section {
+    background: linear-gradient(165deg, #ffffff 0%, #f8fafc 55%, #eef2ff 100%);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 1.5rem 0 1.75rem;
+    animation: fadeUp .45s .28s both;
+    box-shadow: var(--card-shadow);
+    overflow: visible;
   }
-  .dates-title { font-size: .95rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
-  .dates-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem; text-align: center; }
-  @media (max-width: 600px) { .dates-grid { grid-template-columns: repeat(2,1fr); } }
-  .date-item { display: flex; flex-direction: column; gap: .2rem; }
-  .date-val  { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; line-height: 1.15; }
-  .date-lbl  { font-size: .7rem; color: var(--gray-500); line-height: 1.35; }
-  .date-amber { color: #d97706; }
-  .date-blue  { color: #2563eb; }
-  .date-green { color: #16a34a; }
-  .date-purple { color: #7c3aed; }
-  .date-teal  { color: #0d9488; }
+  .timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0 1.5rem 1rem;
+    border-bottom: 1px solid rgba(226,232,240,.8);
+    margin-bottom: .5rem;
+  }
+  .timeline-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -.2px;
+  }
+  .timeline-sub {
+    font-size: .72rem;
+    color: var(--gray-500);
+  }
+  .timeline-legend {
+    display: flex;
+    gap: .85rem;
+    flex-wrap: wrap;
+  }
+  .timeline-legend-item {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .68rem;
+    color: var(--gray-500);
+  }
+  .timeline-legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .timeline-legend-dot.past { background: #94a3b8; }
+  .timeline-legend-dot.current {
+    background: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.25);
+  }
+  .timeline-legend-dot.future { background: #e2e8f0; border: 2px solid #94a3b8; }
+
+  .timeline-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 1rem 1rem 1.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .timeline-scroll::-webkit-scrollbar { height: 6px; }
+  .timeline-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+  }
+
+  .timeline-track {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: max(100%, 920px);
+    padding: 5rem 1.5rem 5rem;
+  }
+  .timeline-track::before {
+    content: '';
+    position: absolute;
+    left: 2.5rem;
+    right: 2.5rem;
+    top: 50%;
+    height: 5px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: linear-gradient(90deg, #fbbf24, #60a5fa, #818cf8, #a78bfa, #34d399, #2dd4bf);
+    opacity: .35;
+    z-index: 0;
+  }
+  .timeline-track::after {
+    content: '';
+    position: absolute;
+    left: 2.5rem;
+    right: 2.5rem;
+    top: 50%;
+    height: 5px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f59e0b, #3b82f6, #6366f1, #8b5cf6, #10b981, #14b8a6);
+    opacity: .85;
+    z-index: 0;
+    width: var(--timeline-progress, 0%);
+    max-width: calc(100% - 5rem);
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  .timeline-milestone {
+    flex: 1;
+    min-width: 138px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    animation: milestoneIn .55s both;
+  }
+  .timeline-milestone:nth-child(odd) { flex-direction: column; padding-bottom: 0; }
+  .timeline-milestone:nth-child(even) { flex-direction: column-reverse; }
+
+  @keyframes milestoneIn {
+    from { opacity: 0; transform: translateY(16px) scale(.92); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .milestone-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: .85rem .75rem .75rem;
+    text-align: center;
+    border: 1.5px solid var(--gray-200);
+    box-shadow: 0 2px 8px rgba(26,26,46,.06);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s, border-color .25s;
+    cursor: default;
+    width: 100%;
+    max-width: 126px;
+    position: relative;
+  }
+  .timeline-milestone:nth-child(odd) .milestone-card { margin-bottom: 1.35rem; }
+  .timeline-milestone:nth-child(even) .milestone-card { margin-top: 1.35rem; }
+
+  .timeline-milestone:hover .milestone-card,
+  .timeline-milestone:focus-within .milestone-card {
+    transform: scale(1.14) translateY(-4px);
+    box-shadow: 0 16px 40px rgba(26,26,46,.14);
+    border-color: var(--accent, #2563eb);
+    z-index: 5;
+  }
+
+  .milestone-date {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    line-height: 1;
+    color: var(--accent, var(--navy));
+    transition: font-size .3s;
+  }
+  .timeline-milestone:hover .milestone-date { font-size: 1.5rem; }
+
+  .milestone-year {
+    font-size: .62rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    margin-top: .15rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .milestone-label {
+    font-size: .67rem;
+    color: var(--gray-500);
+    line-height: 1.35;
+    margin-top: .45rem;
+    transition: color .25s;
+  }
+  .timeline-milestone:hover .milestone-label { color: var(--gray-700); }
+
+  .milestone-full {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%) translateY(6px) scale(.95);
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    background: var(--navy);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 600;
+    padding: .35rem .65rem;
+    border-radius: 8px;
+    transition: opacity .25s, transform .25s;
+    z-index: 10;
+  }
+  .timeline-milestone:nth-child(even) .milestone-full {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .milestone-full::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--navy);
+    top: 100%;
+  }
+  .timeline-milestone:nth-child(even) .milestone-full::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: var(--navy);
+  }
+  .timeline-milestone:hover .milestone-full {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  .milestone-connector {
+    width: 2px;
+    height: 1.1rem;
+    background: linear-gradient(180deg, var(--accent, #94a3b8), rgba(148,163,184,.25));
+    flex-shrink: 0;
+    transition: height .3s, opacity .3s;
+  }
+  .timeline-milestone:hover .milestone-connector { height: 1.35rem; opacity: 1; }
+
+  .milestone-node { position: relative; display: flex; align-items: center; justify-content: center; }
+  .milestone-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent, #94a3b8);
+    box-shadow: 0 0 0 4px rgba(255,255,255,.95);
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s, border-width .25s;
+    position: relative;
+    z-index: 2;
+  }
+  .timeline-milestone:hover .milestone-dot {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 5px rgba(255,255,255,.95), 0 0 0 8px var(--accent-glow, rgba(37,99,235,.2)), 0 8px 24px var(--accent-glow, rgba(37,99,235,.25));
+  }
+
+  .timeline-milestone.is-past .milestone-dot { background: var(--accent); }
+  .timeline-milestone.is-current .milestone-dot {
+    background: var(--accent);
+    animation: currentPulse 2s ease-in-out infinite;
+  }
+  .timeline-milestone.is-future .milestone-dot { background: #fff; }
+
+  @keyframes currentPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 0 0 8px var(--accent-glow); }
+    50% { box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 0 0 14px transparent, 0 0 20px var(--accent-glow); }
+  }
+
+  .timeline-milestone.is-past .milestone-card { opacity: .82; }
+  .timeline-milestone.is-current .milestone-card {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .milestone-status {
+    position: absolute;
+    top: -.45rem;
+    right: -.45rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .55rem;
+    opacity: 0;
+    transform: scale(.5);
+    transition: opacity .25s, transform .25s;
+  }
+  .timeline-milestone.is-past .milestone-status {
+    opacity: 1;
+    transform: scale(1);
+    background: #ecfdf5;
+    border-color: #86efac;
+    color: #16a34a;
+  }
+  .timeline-milestone.is-current .milestone-status {
+    opacity: 1;
+    transform: scale(1);
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+    font-size: .5rem;
+    font-weight: 700;
+  }
+
+  .theme-amber { --accent: #d97706; --accent-glow: rgba(217,119,6,.28); }
+  .theme-blue  { --accent: #2563eb; --accent-glow: rgba(37,99,235,.28); }
+  .theme-green { --accent: #16a34a; --accent-glow: rgba(22,163,74,.28); }
+  .theme-purple{ --accent: #7c3aed; --accent-glow: rgba(124,58,237,.28); }
+  .theme-teal  { --accent: #0d9488; --accent-glow: rgba(13,148,136,.28); }
+
+  @media (max-width: 700px) {
+    .timeline-track {
+      flex-direction: column;
+      align-items: stretch;
+      min-width: auto;
+      padding: 1rem 1.25rem;
+      gap: 0;
+    }
+    .timeline-track::before,
+    .timeline-track::after {
+      left: 1.65rem;
+      right: auto;
+      top: 1rem;
+      bottom: 1rem;
+      width: 5px;
+      height: auto;
+      transform: none;
+    }
+    .timeline-track::after {
+      max-width: none;
+      width: 5px;
+      height: var(--timeline-progress, 0%);
+    }
+    .timeline-milestone,
+    .timeline-milestone:nth-child(even) {
+      flex-direction: row;
+      align-items: center;
+      min-width: auto;
+      gap: .85rem;
+      padding: .35rem 0;
+    }
+    .timeline-milestone .milestone-card,
+    .timeline-milestone:nth-child(even) .milestone-card,
+    .timeline-milestone:nth-child(odd) .milestone-card {
+      margin: 0;
+      max-width: none;
+      flex: 1;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .85rem 1rem;
+    }
+    .milestone-card-inner { flex: 1; }
+    .milestone-connector { width: 1.1rem; height: 2px; }
+    .timeline-milestone:hover .milestone-connector { width: 1.35rem; height: 2px; }
+    .milestone-full { display: none; }
+  }
   
   /* ── FOOTER ── */
   .site-footer {
@@ -350,6 +701,18 @@
     background: #fef2f2;
     border-radius: 12px;
     margin: 1rem 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
 </head>
@@ -408,7 +771,7 @@
 
   <!-- TAB FECHAS -->
   <div id="tab-fechas" class="tab-panel">
-    <div class="bottom-row">
+    <div class="fechas-layout">
       <div class="insumos-box">
         <div class="insumos-title">📋 Solicitud de insumos para pruebas E2E</div>
         <div class="insumos-deadline" id="insumosDeadline">⚠️ Cargando...</div>
@@ -421,12 +784,25 @@
           <span class="area-chip">JDE</span>
         </div>
       </div>
-      <div class="dates-box">
-        <div class="dates-title">🗓 Fechas clave del proyecto</div>
-        <div class="dates-grid" id="datesGrid">
-          <div class="loading-msg" style="padding:1rem; grid-column:1/-1;">Cargando fechas...</div>
+
+      <section class="timeline-section">
+        <div class="timeline-header">
+          <div>
+            <div class="timeline-title">🗓 Línea de tiempo del piloto</div>
+            <div class="timeline-sub">Pasa el cursor sobre cada hito para ver el detalle</div>
+          </div>
+          <div class="timeline-legend">
+            <span class="timeline-legend-item"><span class="timeline-legend-dot past"></span> Completado</span>
+            <span class="timeline-legend-item"><span class="timeline-legend-dot current"></span> Próximo hito</span>
+            <span class="timeline-legend-item"><span class="timeline-legend-dot future"></span> Pendiente</span>
+          </div>
         </div>
-      </div>
+        <div class="timeline-scroll">
+          <div class="timeline-track" id="datesGrid">
+            <div class="loading-msg" style="padding:2rem;">Cargando línea de tiempo...</div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
@@ -447,12 +823,12 @@ let devData = [];
 let config = {};
 
 const DATE_FIELDS = [
-  { key: 'insumos_fecha', label: 'Entrega insumos E2E<br>(matriz de casos)', color: 'date-amber' },
-  { key: 'e2e_corte 1', label: 'E2E Corte 1', color: 'date-blue' },
-  { key: 'e2e_corte 2', label: 'E2E Corte 2', color: 'date-blue' },
-  { key: 'Go no go', label: 'Go / No Go', color: 'date-purple' },
-  { key: 'go_live Primera Venta', label: 'Go Live<br>Primera Venta', color: 'date-green' },
-  { key: 'Primer Despacho', label: 'Primer Despacho', color: 'date-teal' }
+  { key: 'insumos_fecha', label: 'Entrega insumos E2E (matriz de casos)', color: 'theme-amber' },
+  { key: 'e2e_corte 1', label: 'E2E Corte 1', color: 'theme-blue' },
+  { key: 'e2e_corte 2', label: 'E2E Corte 2', color: 'theme-blue' },
+  { key: 'Go no go', label: 'Go / No Go', color: 'theme-purple' },
+  { key: 'go_live Primera Venta', label: 'Go Live Primera Venta', color: 'theme-green' },
+  { key: 'Primer Despacho', label: 'Primer Despacho', color: 'theme-teal' }
 ];
 
 const CONFIG_META_KEYS = new Set(['clave', 'semana', 'mes_anio']);
@@ -632,6 +1008,56 @@ function renderDevCards() {
   }).join('');
 }
 
+function parseDateValue(dateStr) {
+  if (!dateStr) return null;
+
+  const textMatch = String(dateStr).match(/^(\d{1,2})\s+([a-záéíóúñ]+)(?:\s+(\d{4}))?/i);
+  if (textMatch) {
+    const months = {
+      enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+      julio: 6, agosto: 7, septiembre: 8, octubre: 9, noviembre: 10, diciembre: 11
+    };
+    const month = months[textMatch[2].toLowerCase()];
+    if (month !== undefined) {
+      return new Date(Number(textMatch[3] || 2026), month, Number(textMatch[1]));
+    }
+  }
+
+  const parsed = new Date(dateStr);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getDateParts(dateStr) {
+  const full = formatDate(dateStr);
+  const short = formatShortDate(dateStr);
+  const parsed = parseDateValue(dateStr);
+  const year = parsed ? parsed.getFullYear() : '';
+  return { full, short, parsed, year };
+}
+
+function getMilestoneStatus(parsed, index, currentIndex) {
+  if (currentIndex === index) return 'is-current';
+  if (currentIndex === -1 || index < currentIndex) return 'is-past';
+  return 'is-future';
+}
+
+function getCurrentMilestoneIndex(fields) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let currentIndex = -1;
+  fields.forEach((field, index) => {
+    const parsed = parseDateValue(config[field.key]);
+    if (parsed) {
+      parsed.setHours(0, 0, 0, 0);
+      if (parsed >= today) currentIndex = currentIndex === -1 ? index : currentIndex;
+    }
+  });
+
+  if (currentIndex === -1) return fields.length - 1;
+  return currentIndex;
+}
+
 function renderDates() {
   const fechaInsumos = formatDate(config.insumos_fecha) || '—';
 
@@ -641,22 +1067,66 @@ function renderDates() {
   const knownKeys = new Set(DATE_FIELDS.map(field => field.key));
   const extraFields = Object.keys(config)
     .filter(key => !CONFIG_META_KEYS.has(key) && !knownKeys.has(key) && config[key])
-    .map(key => ({ key, label: key, color: 'date-blue' }));
+    .map(key => ({ key, label: key, color: 'theme-blue' }));
 
-  const fields = [...DATE_FIELDS, ...extraFields].filter(field => config[field.key]);
+  const fields = [...DATE_FIELDS, ...extraFields]
+    .filter(field => config[field.key])
+    .sort((a, b) => {
+      const dateA = parseDateValue(config[a.key]);
+      const dateB = parseDateValue(config[b.key]);
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      return dateA - dateB;
+    });
 
-  const grid = document.getElementById('datesGrid');
+  const track = document.getElementById('datesGrid');
   if (!fields.length) {
-    grid.innerHTML = '<div class="loading-msg" style="padding:1rem; grid-column:1/-1;">Sin fechas configuradas</div>';
+    track.innerHTML = '<div class="loading-msg" style="padding:2rem;">Sin fechas configuradas</div>';
+    track.style.removeProperty('--timeline-progress');
     return;
   }
 
-  grid.innerHTML = fields.map(field => `
-    <div class="date-item">
-      <div class="date-val ${field.color}">${formatShortDate(config[field.key])}</div>
-      <div class="date-lbl">${field.label}</div>
-    </div>
-  `).join('');
+  const currentIndex = getCurrentMilestoneIndex(fields);
+  const progressPct = fields.length > 1
+    ? `${(currentIndex / (fields.length - 1)) * 100}%`
+    : '100%';
+  track.style.setProperty('--timeline-progress', progressPct);
+
+  track.innerHTML = fields.map((field, index) => {
+    const parts = getDateParts(config[field.key]);
+    const status = getMilestoneStatus(parts.parsed, index, currentIndex);
+    const statusIcon = status === 'is-past' ? '✓' : status === 'is-current' ? '●' : '';
+    const statusLabel = status === 'is-past'
+      ? 'Completado'
+      : status === 'is-current'
+        ? 'Próximo hito'
+        : 'Pendiente';
+
+    return `
+      <article
+        class="timeline-milestone ${field.color} ${status}"
+        style="animation-delay:${index * 0.08}s"
+        tabindex="0"
+        aria-label="${field.label}: ${parts.full}"
+      >
+        <div class="milestone-card">
+          <span class="milestone-status" aria-hidden="true">${statusIcon}</span>
+          <span class="milestone-full">${parts.full}</span>
+          <div class="milestone-card-inner">
+            <div class="milestone-date">${parts.short}</div>
+            ${parts.year ? `<div class="milestone-year">${parts.year}</div>` : ''}
+            <div class="milestone-label">${field.label}</div>
+          </div>
+        </div>
+        <div class="milestone-connector" aria-hidden="true"></div>
+        <div class="milestone-node" aria-hidden="true">
+          <div class="milestone-dot"></div>
+        </div>
+        <span class="sr-only">${statusLabel}</span>
+      </article>
+    `;
+  }).join('');
 }
 
 function switchTab(id, btn) {
